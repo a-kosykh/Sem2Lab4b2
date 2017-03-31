@@ -57,18 +57,22 @@ void Salary::print()
 	cout << endl;
 }
 Worker *pF[2];
-void threadfoo(unsigned int n) {
-	m.lock();
+/*void threadfoo(unsigned int n) {
 	WaitForSingleObject(hEvent, INFINITE);
-	while (1) {
+	while (WaitForSingleObject(hEvent, 0) == WAIT_OBJECT_0) {
 		pF[n]->print();
-		WaitForSingleObject(hEvent, INFINITE);
 	}
-	
-	m.unlock();
-	
+}*/
+void threadfoo(unsigned int n) {
+	while (1) {
+		while (WaitForSingleObject(hEvent, 0) == WAIT_OBJECT_0) {
+			m.lock();
+			pF[n]->print();
+			m.unlock();
+			WaitForSingleObject(hEvent, INFINITE);
+		}
+	}
 }
-
 
 
 int main() {
@@ -77,11 +81,12 @@ int main() {
 	pF[1] = new Salary("Name", "Surname", 1998, 100022);
 	thread th[2];
 
-	for (unsigned int i = 0; i < 2; ++i) {
-		th[i] = thread(threadfoo, i);
-		th[i].join();
-	}
-
+	th[0] = thread(threadfoo, 0);
+	th[1] = thread(threadfoo, 1);
+	
+	th[0].join();
+	th[1].join();
+	CloseHandle(hEvent);
 	system("pause");
 	return 0;
 }
