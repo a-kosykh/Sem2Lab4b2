@@ -53,14 +53,18 @@ void Salary::print()
 	cout << sur_ << endl;
 	cout << year_ << endl;
 	cout << monthSalary_ << endl;
-	cout << daySalary_ << endl;
+	cout << "Day salary: " << daySalary_ << endl;
 	cout << endl;
 }
 Worker *pF[2];
 void threadfoo(unsigned int n) {
 	m.lock();
 	WaitForSingleObject(hEvent, INFINITE);
-	pF[n]->print();
+	while (1) {
+		pF[n]->print();
+		WaitForSingleObject(hEvent, INFINITE);
+	}
+	
 	m.unlock();
 	
 }
@@ -70,7 +74,7 @@ void threadfoo(unsigned int n) {
 int main() {
 	hEvent = CreateEvent(0, 1, 0, L"MyEvent1");
 	pF[0] = new Salary("Alex", "Kosykh", 1999, 100000);
-	pF[1] = new Salary("domi", "asdas", 1998, 100022);
+	pF[1] = new Salary("Name", "Surname", 1998, 100022);
 	thread th[2];
 
 	for (unsigned int i = 0; i < 2; ++i) {
